@@ -258,7 +258,7 @@ for i in range(len(nodes_dict)):
     elements.append({'data': nodes_dict[i]})
 
 ############### Create sankey ####################
-    
+
 def create_sankey(data):
     yr_type_df = data[['Year', 'Type']]
     count_df = yr_type_df.value_counts()
@@ -268,22 +268,68 @@ def create_sankey(data):
     uni_type = pd.DataFrame(data['Type'].drop_duplicates())
     uni_type.sort_values('Type',inplace=True)
     uni_type_list = uni_type['Type'].to_list()
-    uni_vals = uni_year_list + uni_type_list
+    uni_sys = list(data.columns)
+    uni_sys_df = pd.DataFrame(uni_sys,columns=["sys_author"])
+    uni_sys_df = uni_sys_df.iloc[13:63]
+    uni_sys_df.sort_values("sys_author", inplace=True)
+    uni_vals = uni_type_list + uni_year_list
     
-    color = ['#b26efa','#957aff','#7085ff','#398fff','#0097ff','#009eff','#00a4ff','#00a9ff',
-                 '#00adff','#00b1f7','#00b3ea','#00b6dd','#00b7ce','#00b9c0',
-                 '#00b9b2','#00baa4','#00ba97','#23ba8b','#23628F','#8F6A23','#6B238F','#4F8F23']
+    # color = ['#b26efa','#957aff','#7085ff','#398fff','#0097ff','#009eff','#00a4ff','#00a9ff',
+    #              '#00adff','#00b1f7','#00b3ea','#00b6dd','#00b7ce','#00b9c0',
+    #              '#00b9b2','#00baa4','#00ba97','#23ba8b','#23628F','#8F6A23','#6B238F','#4F8F23']
+    
+    color = ['#6d92ce','#175666','#abb590','#07000c','#8e4429','#2b2b20','#5476f2','#cef9b8','#0c0326',
+             '#aed125','#d5e212','#aa5c8f','#146d9e','#e20641','#3a2b15','#595355','#78d39b','#d3d8a9','#3f73c1',
+             '#293ce5','#b58682','#303435','#423637','#d9bdef','#303502','#f2eb2b','#89db0f','#6a6b68','#888989',
+             '#330707','#8c98af','#5b00aa','#968b87','#6f968e','#9c6ed8','#e05cbf','#24cc97','#68b8ed','#062e30',
+             '#382f37','#8b16a3','#535926','#005126','#543b75','#2d3e5b','#455b14','#a398e2','#875f69','#031e44',
+             '#858f93','#23628F','#8F6A23','#6B238F','#4F8F23','#b26efa','#957aff','#7085ff','#398fff','#0097ff',
+             '#009eff','#00a4ff','#00a9ff','#00adff','#00b1f7','#00b3ea','#00b6dd','#00b7ce','#00b9c0','#00b9b2',
+             '#00baa4','#00ba97','#23ba8b'
+             ]
     
     source_list = list()
     target_list = list()
     for i in range(len(yr_type_df)):
         for j in range(len(uni_vals)):
             if yr_type_df.iloc[i,0] == uni_vals[j]:
-                source_list.append(j)
+                target_list.append(j)
     for i in range(len(yr_type_df)):
         for j in range(len(uni_vals)):
             if yr_type_df.iloc[i,1] == uni_vals[j]:
-                target_list.append(j)
+                source_list.append(j)
+    
+    type_df = data.iloc[:,9]
+    sys_df = data.iloc[:,14:64]
+    type_sys_df = pd.concat([type_df,sys_df],axis=1)
+    uni_sys_df = pd.DataFrame(uni_sys,columns=["sys_author"])
+    uni_sys_df = uni_sys_df.iloc[14:64]
+    uni_sys_list = uni_sys_df["sys_author"].to_list()
+    uni_type_sys_vals = uni_sys_list + uni_type_list
+    
+    source_list_two = list()
+    target_list_two = list()
+    for i in range(len(type_sys_df)):
+        for j in range(len(uni_type_sys_vals)):
+            if type_sys_df.iloc[i,0] == uni_type_sys_vals[j]:
+                for k in range(1,51):
+                    if type_sys_df.iloc[i,k] >= 1:
+                        target_list_two.append(j)
+    for i in range(len(type_sys_df)):
+        for j in range(1,51):
+            if type_sys_df.iloc[i,j] >= 1:
+                source_list_two.append(j-1)
+    
+    #source_list_two_adj = [x + 18 for x in source_list_two]           
+    #target_list_two_adj = [x + 22 for x in target_list_two]
+    #uni_vals = uni_vals + uni_sys_list
+    
+    source_list_adj = [x + 50 for x in source_list]
+    target_list_adj = [x + 50 for x in target_list]
+    uni_vals = uni_type_sys_vals + uni_year_list
+    
+    source_list = source_list_two + source_list_adj
+    target_list = target_list_two + target_list_adj
     
     s_t_df = pd.DataFrame([source_list, target_list])
     s_t_df = s_t_df.transpose()
@@ -293,13 +339,13 @@ def create_sankey(data):
     link_col = ['#23628F','#8F6A23','#6B238F','#4F8F23']
     link_col_list = list()
     for i in range(len(s_t_uni)):
-        if s_t_uni.iloc[i,1] == 18:
+        if s_t_uni.iloc[i,0] == 50 or s_t_uni.iloc[i,1] == 50:
             link_col_list.append(link_col[0])
-        elif s_t_uni.iloc[i,1] == 19:
+        elif s_t_uni.iloc[i,0] == 51 or s_t_uni.iloc[i,1] == 51:
             link_col_list.append(link_col[1])
-        elif s_t_uni.iloc[i,1] == 20:
+        elif s_t_uni.iloc[i,0] == 52 or s_t_uni.iloc[i,1] == 52:
             link_col_list.append(link_col[2])
-        elif s_t_uni.iloc[i,1] == 21:
+        elif s_t_uni.iloc[i,0] == 53 or s_t_uni.iloc[i,1] == 53:
             link_col_list.append(link_col[3])
     
     source_ser = s_t_uni['source'].squeeze()
@@ -309,7 +355,7 @@ def create_sankey(data):
     node_dict = {'color': color,
                  'label': uni_vals,
                  'line': {'color': 'black', 'width': 0.5},
-                 'pad': 25,
+                 'pad': 50,
                  'thickness': 50}
     link_dict = {'color': link_col_list,
                  'line': {'color': 'black', 'width': 0.2},
@@ -319,7 +365,7 @@ def create_sankey(data):
     layout_dict = {'font': {'size': 20, 'color': 'black'},
                    'hoverlabel': {'bgcolor': 'white', 'font': {'color': 'black'}}}
     
-    return node_dict, link_dict, layout_dict
+    return node_dict, link_dict, layout_dict    
 
 sank_nodes, sank_links, sank_layout = create_sankey(data)
 sank_fig = go.Figure(go.Sankey(link=sank_links,node=sank_nodes))
@@ -698,14 +744,52 @@ app.layout = html.Div([
         html.Div(className='center-items', children=[
             html.Div(className='text-center', children=[
                 html.H2('Primary studies year of publication and study type'),
-                html.P(className='explan-text', children=['In the sankey diagram below the year of publication and '
-                       'the study type for all of the primary studies in the '
+                html.P(className='explan-text', children=['In the sankey diagram below the systematic review first author surname, '
+                       'the study type and year of publication for all of the primary studies in the '
                        'systematic reviews are described'])
+                ]),
+            ]),
+        html.Div(className='row', children=[
+            html.Div(className='col-4', children=[
+                html.H3('Systematic review author surname')
+                ]),
+            html.Div(className='col-4', children=[
+                html.Div(className='center-items', children=[
+                    html.Div(className='text-center', children=[
+                        html.H3('Study type')
+                        ]),
+                    ]),
+                ]),
+            html.Div(className='col-4', children=[
+                html.Div(className='center-items', children=[
+                    html.Div(className='text-center', children=[
+                        html.H3('Publication year')
+                        ]),
+                    ]),
                 ]),
             ]),
         html.Div([
             dcc.Graph(figure=sank_fig,
-                      style={'height': '800px'})
+                      style={'height': '1400px'})
+            ]),
+        html.Div(className='row', children=[
+            html.Div(className='col-4', children=[
+                html.H3('Systematic review author surname')
+                ]),
+            html.Div(className='col-4', children=[
+                html.Div(className='center-items', children=[
+                    html.Div(className='text-center', children=[
+                        html.H3('Study type')
+                        ]),
+                    ]),
+                ]),
+            html.Div(className='col-4', children=[
+                html.Div(className='center-items', children=[
+                    html.Div(className='text-center', children=[
+                        html.H3('Publication year')
+                        ]),
+                    ]),
+                ]),
             ]),
         ]),
     ])
