@@ -356,7 +356,9 @@ def create_sankey(data):
                  'label': uni_vals,
                  'line': {'color': 'black', 'width': 0.5},
                  'pad': 50,
-                 'thickness': 50}
+                 'thickness': 50,
+                 #'hovertemplate': "%{label} <br>Value x: %{value} <br>Value y: %{categorycount} <extra></extra>"
+                 }
     link_dict = {'color': link_col_list,
                  'line': {'color': 'black', 'width': 0.2},
                  'source': source_ser,
@@ -370,6 +372,7 @@ def create_sankey(data):
 sank_nodes, sank_links, sank_layout = create_sankey(data)
 sank_fig = go.Figure(go.Sankey(link=sank_links,node=sank_nodes))
 sank_fig.update_layout(sank_layout)
+sank_fig.update_traces(hoverinfo="all", selector=dict(type='sankey'))
 
 ################ Create timeline ###################
 
@@ -615,7 +618,9 @@ server = app.server
 
 app.layout = html.Div([
     html.Div(children=[
-        html.H1(className='site-title, text-center',children=['WILFRED Data Explorer'])
+        html.H1(className='site-title, text-center',children=['Data Explorer']),
+        html.H3(className='site-title, text-center',children=['Systematic reviews of convalescent plasma in COVID-19 continue to be poorly conducted and reported: a systematic review']),
+        html.P(className='site-title, text-center',children=['Whear, R., Bethel, A., Abbott, R., Rogers, M., Orr, N., Manzi, S., Ukoumunne, O. C., Stein, K. & Thompson Coon, J. Systematic reviews of convalescent plasma in COVID-19 continue to be poorly conducted and reported: a systematic review. [published online ahead of print, 2022 Aug 4]. J Clin Epidemiol. 2022;S0895-4356(22)00178-0. doi:10.1016/j.jclinepi.2022.07.005'])
         ]),
     html.Div(className='spacer', children=[]),
     html.Div(className='center-items', children=[
@@ -656,6 +661,12 @@ app.layout = html.Div([
                 ]),
         html.Div(className='col-4', children=[
             html.Div(className='center-items', children=[
+                html.Div(className='text-center', children=[
+                    html.H3(children=['Network legend']),
+                    ]),
+                html.Div(className='text-center', children=[
+                    html.Img(src=app.get_asset_url('images/network_legend.png'))
+                    ]),
                 html.Div(className='text-center', children=[
                     html.H3(children=['Study information']),
                     ]),
@@ -746,7 +757,16 @@ app.layout = html.Div([
                 html.H2('Primary studies year of publication and study type'),
                 html.P(className='explan-text', children=['In the sankey diagram below the systematic review first author surname, '
                        'the study type and year of publication for all of the primary studies in the '
-                       'systematic reviews are described'])
+                       'systematic reviews are described']),
+                html.P(className='explan-text', children=['When you hover on the sankey diagram below information about the nodes '
+                                                          'and links will appear. In the systematic review author surname column, the '
+                                                          'outgoing flow count represents the number of primary studies arising from '
+                                                          'that systematic review. In the primary study design column, the incoming '
+                                                          'flow count value represents the number of systematic reviews with that study '
+                                                          'design. The figure on the left hand side represents the total number of studies '
+                                                          'of the design. The incoming flow count in the primary study publication year '
+                                                          'column gives the number of primary study design types published in that year. '
+                                                          'The value on the left hand side is the number of studies published in that year.'])
                 ]),
             ]),
         html.Div(className='row', children=[
@@ -756,14 +776,14 @@ app.layout = html.Div([
             html.Div(className='col-4', children=[
                 html.Div(className='center-items', children=[
                     html.Div(className='text-center', children=[
-                        html.H3('Study type')
+                        html.H3('Primary study Design')
                         ]),
                     ]),
                 ]),
             html.Div(className='col-4', children=[
                 html.Div(className='center-items', children=[
                     html.Div(className='text-center', children=[
-                        html.H3('Publication year')
+                        html.H3('Primary study publication year')
                         ]),
                     ]),
                 ]),
@@ -779,14 +799,14 @@ app.layout = html.Div([
             html.Div(className='col-4', children=[
                 html.Div(className='center-items', children=[
                     html.Div(className='text-center', children=[
-                        html.H3('Study type')
+                        html.H3('Primary study Design')
                         ]),
                     ]),
                 ]),
             html.Div(className='col-4', children=[
                 html.Div(className='center-items', children=[
                     html.Div(className='text-center', children=[
-                        html.H3('Publication year')
+                        html.H3('Primary study publication year')
                         ]),
                     ]),
                 ]),
